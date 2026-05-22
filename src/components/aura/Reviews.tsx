@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { approvedReviewsQuery } from "@/lib/store-service";
+import { StaggerTestimonials } from "@/components/ui/stagger-testimonials";
 
 export function Reviews() {
   const { data: dbReviews = [], isLoading } = useQuery(approvedReviewsQuery);
