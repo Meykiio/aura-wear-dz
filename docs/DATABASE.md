@@ -20,6 +20,8 @@ PostgreSQL on Supabase. RLS is enabled on every table. Schema is defined entirel
 | 12 | `20260522211500_grant_service_role_select.sql` | Grants `SELECT ON ALL TABLES` to `service_role` so the server-side admin client can bypass RLS. |
 | 13 | `20260522212000_fix_reviews_approved.sql` | Fixes reviews seed (trigger forced `is_approved=false`). Drops trigger, updates/inserts rows with `is_approved=true`, re-creates trigger. |
 | 14 | `20260522213000_grant_admin_orders_crud.sql` | Grants `INSERT, UPDATE, DELETE` on `orders` to `authenticated`. Was missing from the initial admin CRUD migration — caused 401 on status update. |
+| 15 | `20260522214000_add_image_urls_array.sql` | Adds `image_urls text[] DEFAULT '{}'` to `product_colors` for storing multiple variant images per color (e.g. male + female). |
+| 16 | `20260522214500_seed_tshirt_regular_colors.sql` | Seeds 21 colors with images for the T-shirt Regular product from the catalogue. |
 
 ## Tables
 
@@ -63,7 +65,8 @@ Catalog items.
 | product_id | text | FK → `products(id)` ON DELETE CASCADE |
 | name | text | Arabic name |
 | hex | text | display swatch |
-| image_url | text | nullable preview image |
+| image_url | text | nullable primary preview image |
+| image_urls | text[] | default `'{}'`. All variant images for this color (male, female, etc.). Cycle displayed in the tooltip. |
 
 ### `public.packs`
 | Column | Type | Notes |

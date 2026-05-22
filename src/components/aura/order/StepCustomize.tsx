@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from "react";
+import { useState, useEffect, type CSSProperties } from "react";
 import type { Product, PackUnit } from "@/lib/store-service";
 
 interface UnitState {
@@ -17,7 +17,7 @@ interface TooltipState {
   visible: boolean;
   x: number;
   y: number;
-  image_url?: string | null;
+  image_urls: string[];
   hex: string;
   name: string;
   offsetX: number;
@@ -25,9 +25,20 @@ interface TooltipState {
 }
 
 function ColorTooltip({ tooltip }: { tooltip: TooltipState }) {
-  if (!tooltip.visible) return null;
+  const [current, setCurrent] = useState(0);
 
-  const { x, y, image_url, hex, name, offsetX, offsetY } = tooltip;
+  const { x, y, image_urls, hex, name, offsetX, offsetY } = tooltip;
+
+  useEffect(() => {
+    setCurrent(0);
+    if (image_urls.length <= 1) return;
+    const id = setInterval(() => {
+      setCurrent((i) => (i + 1) % image_urls.length);
+    }, 3000);
+    return () => clearInterval(id);
+  }, [image_urls]);
+
+  if (!tooltip.visible) return null;
 
   const baseClasses = "fixed z-50 pointer-events-none animate-in fade-in zoom-in-95 duration-200";
   const sizeClasses = "w-44 sm:w-52 aspect-[9/16]";
@@ -38,11 +49,19 @@ function ColorTooltip({ tooltip }: { tooltip: TooltipState }) {
     top: y + offsetY,
   };
 
-  if (image_url) {
+  if (image_urls.length > 0) {
     return (
       <div className={baseClasses} style={style}>
-        <div className={`${sizeClasses} ${roundedClasses} bg-aura-surface-2`}>
-          <img src={image_url} alt={name} className="w-full h-full object-cover" />
+        <div className={`${sizeClasses} ${roundedClasses} bg-aura-surface-2 relative`}>
+          {image_urls.map((url, i) => (
+            <img
+              key={url}
+              src={url}
+              alt={`${name} ${i + 1}`}
+              className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out"
+              style={{ opacity: i === current ? 1 : 0 }}
+            />
+          ))}
         </div>
       </div>
     );
@@ -60,7 +79,7 @@ function ColorTooltip({ tooltip }: { tooltip: TooltipState }) {
 }
 
 export function StepCustomize({ units, productsMap, values, onChange }: Props) {
-  const [tooltip, setTooltip] = useState<TooltipState>({ visible: false, x: 0, y: 0, hex: "", name: "", offsetX: 0, offsetY: 0 });
+  const [tooltip, setTooltip] = useState<TooltipState>({ visible: false, x: 0, y: 0, image_urls: [], hex: "", name: "", offsetX: 0, offsetY: 0 });
 
   const TOOLTIP_W = 208;
   const TOOLTIP_H = (TOOLTIP_W * 16) / 9;
@@ -86,9 +105,9 @@ export function StepCustomize({ units, productsMap, values, onChange }: Props) {
     return { offsetX, offsetY };
   };
 
-  const handleColorMove = (e: React.MouseEvent, image_url: string | null | undefined, hex: string, name: string) => {
+  const handleColorMove = (e: React.MouseEvent, image_urls: string[], hex: string, name: string) => {
     const { offsetX, offsetY } = calcPosition(e.clientX, e.clientY);
-    setTooltip({ visible: true, x: e.clientX, y: e.clientY, image_url, hex, name, offsetX, offsetY });
+    setTooltip({ visible: true, x: e.clientX, y: e.clientY, image_urls, hex, name, offsetX, offsetY });
   };
 
   return (
@@ -133,7 +152,7 @@ export function StepCustomize({ units, productsMap, values, onChange }: Props) {
                   return (
                     <button
                       key={c.id}
-                      onMouseMove={(e) => handleColorMove(e, c.image_url, c.hex, c.name)}
+                      onMouseMove={(e) => handleColorMove(e, c.image_urls, c.hex, c.name)}
                       onMouseLeave={() => setTooltip((prev) => ({ ...prev, visible: false }))}
                       onClick={() => onChange(u.id, { color: c.name })}
                       title={c.name}
