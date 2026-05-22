@@ -20,6 +20,7 @@ export function Hero({ scrollToPacks }: HeroProps) {
           loop
           muted
           playsInline
+          suppressHydrationWarning
           className="absolute inset-0 w-full h-full object-cover opacity-60"
         >
           <source

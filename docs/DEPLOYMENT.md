@@ -1,6 +1,6 @@
 # Deployment — Vercel
 
-The project is a TanStack Start app built with Vite. Vercel auto-detects the Vite config and ships both the static client bundle and the SSR server entry.
+The project is a TanStack Start app built with Vite + Nitro (`vercel` preset). The build outputs to `.vercel/output/` using the Build Output API — Vercel detects this automatically.
 
 ## 1. Push to GitHub
 ```bash
@@ -10,10 +10,10 @@ git push -u origin main
 
 ## 2. Import into Vercel
 1. https://vercel.com/new → **Import Git Repository** → pick the repo.
-2. **Framework Preset:** Vite (Vercel will detect TanStack Start automatically).
-3. **Build command:** `bun run build` (or leave default `vite build`).
-4. **Output directory:** leave default — TanStack Start writes both client assets and the SSR function automatically.
-5. **Install command:** `bun install` (or `npm install` if you didn't commit `bun.lock`).
+2. **Framework Preset:** Vite (or leave auto-detect — Nitro's Vercel output is recognized automatically).
+3. **Build command:** `npm run build`.
+4. **Output directory:** leave default — Nitro writes to `.vercel/output/`.
+5. **Install command:** `npm install`.
 
 ## 3. Environment variables
 Add **all** of these in **Project → Settings → Environment Variables**, for the `Production`, `Preview`, and `Development` environments:
