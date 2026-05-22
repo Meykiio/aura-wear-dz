@@ -1,0 +1,206 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+/*
+ * AURA WEAR — DESIGN SYSTEM v2
+ * Dark premium streetwear aesthetic with violet brand accent.
+ */
+
+@layer base {
+  :root {
+    /* Core Palette */
+    --aura-black:        #0A0A0A;
+    --aura-void:         #111118;
+    --aura-surface:      #16161F;
+    --aura-surface-2:    #1E1E2A;
+    --aura-border:       #2A2A3A;
+    --aura-border-light: #3A3A50;
+
+    /* Purple Brand Accent */
+    --aura-violet:       #7B5CF0;
+    --aura-violet-dim:   #5B3FD0;
+    --aura-violet-glow:  rgba(123, 92, 240, 0.15);
+    --aura-violet-text:  #A78BFA;
+
+    /* Text */
+    --aura-text:         #F0F0F5;
+    --aura-text-muted:   #8888A8;
+    --aura-text-faint:   #555570;
+
+    /* Semantic */
+    --aura-success:      #22C55E;
+    --aura-warning:      #F59E0B;
+    --aura-error:        #EF4444;
+    --aura-info:         #3B82F6;
+
+    /* Status colors for order badges */
+    --status-pending:    #F59E0B;
+    --status-confirmed:  #3B82F6;
+    --status-shipped:    #8B5CF6;
+    --status-delivered:  #22C55E;
+    --status-cancelled:  #EF4444;
+
+    /* Typography */
+    --font-display:      'Bebas Neue', sans-serif;
+    --font-body:         'Tajawal', sans-serif;
+    --font-ui:           'Inter', sans-serif;
+
+    /* Geometry */
+    --radius-pill:       9999px;
+    --radius-card:       12px;
+    --radius-sm:         6px;
+
+    /* Motion */
+    --ease-out-expo:     cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-expo:      cubic-bezier(0.7, 0, 0.84, 0);
+    --duration-fast:     150ms;
+    --duration-base:     250ms;
+    --duration-slow:     400ms;
+  }
+}
+
+@theme inline {
+  /* Core Palette */
+  --color-aura-black:        var(--aura-black);
+  --color-aura-void:         var(--aura-void);
+  --color-aura-surface:      var(--aura-surface);
+  --color-aura-surface-2:    var(--aura-surface-2);
+  --color-aura-border:       var(--aura-border);
+  --color-aura-border-light: var(--aura-border-light);
+
+  /* Purple Brand Accent */
+  --color-aura-violet:       var(--aura-violet);
+  --color-aura-violet-dim:   var(--aura-violet-dim);
+  --color-aura-violet-glow:  var(--aura-violet-glow);
+  --color-aura-violet-text:  var(--aura-violet-text);
+
+  /* Text */
+  --color-aura-text:         var(--aura-text);
+  --color-aura-text-muted:   var(--aura-text-muted);
+  --color-aura-text-faint:   var(--aura-text-faint);
+
+  /* Semantic */
+  --color-aura-success:      var(--aura-success);
+  --color-aura-warning:      var(--aura-warning);
+  --color-aura-error:        var(--aura-error);
+  --color-aura-info:         var(--aura-info);
+
+  /* Status */
+  --color-status-pending:    var(--status-pending);
+  --color-status-confirmed:  var(--status-confirmed);
+  --color-status-shipped:    var(--status-shipped);
+  --color-status-delivered:  var(--status-delivered);
+  --color-status-cancelled:  var(--status-cancelled);
+
+  /* Typography */
+  --font-display: var(--font-display);
+  --font-body:    var(--font-body);
+  --font-ui:      var(--font-ui);
+
+  /* Radii */
+  --radius-none:  0;
+  --radius-sm:    var(--radius-sm);
+  --radius-card:  var(--radius-card);
+  --radius-pill:  var(--radius-pill);
+
+  /* Motion */
+  --ease-out-expo: var(--ease-out-expo);
+  --ease-in-expo:  var(--ease-in-expo);
+  --duration-fast: var(--duration-fast);
+  --duration-base: var(--duration-base);
+  --duration-slow: var(--duration-slow);
+
+  /* shadcn aliases (dark theme) */
+  --color-background:        var(--aura-black);
+  --color-foreground:        var(--aura-text);
+  --color-card:              var(--aura-surface);
+  --color-card-foreground:   var(--aura-text);
+  --color-popover:           var(--aura-surface);
+  --color-popover-foreground:var(--aura-text);
+  --color-primary:           var(--aura-violet);
+  --color-primary-foreground:var(--aura-text);
+  --color-secondary:         var(--aura-surface-2);
+  --color-secondary-foreground:var(--aura-text);
+  --color-muted:             var(--aura-surface-2);
+  --color-muted-foreground:  var(--aura-text-muted);
+  --color-accent:            var(--aura-surface-2);
+  --color-accent-foreground: var(--aura-text);
+  --color-destructive:       var(--aura-error);
+  --color-destructive-foreground:var(--aura-text);
+  --color-border:            var(--aura-border);
+  --color-input:             var(--aura-border);
+  --color-ring:              var(--aura-violet);
+
+  /* Sidebar (dark) */
+  --color-sidebar:           var(--aura-void);
+  --color-sidebar-foreground:var(--aura-text);
+  --color-sidebar-primary:   var(--aura-violet);
+  --color-sidebar-primary-foreground:var(--aura-text);
+  --color-sidebar-accent:    var(--aura-surface-2);
+  --color-sidebar-accent-foreground:var(--aura-violet-text);
+  --color-sidebar-border:    var(--aura-border);
+  --color-sidebar-ring:      var(--aura-violet);
+}
+
+@layer base {
+  * {
+    border-color: var(--aura-border);
+  }
+
+  html, body {
+    background-color: var(--aura-black);
+    color: var(--aura-text);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    margin: 0;
+  }
+}
+
+/* ============================================
+   Typography utilities (AURA system)
+   ============================================ */
+
+.display-campaign {
+  font-family: var(--font-display);
+  font-size: clamp(56px, 11vw, 96px);
+  line-height: 0.9;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+.display-lg {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 7vw, 64px);
+  line-height: 0.95;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+.display-md {
+  font-family: var(--font-display);
+  font-size: 40px;
+  line-height: 1;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+.heading-xl { font-size: 32px; line-height: 1.15; font-weight: 500; letter-spacing: -0.01em; }
+.heading-lg { font-size: 24px; line-height: 1.2; font-weight: 500; }
+.heading-md { font-size: 20px; line-height: 1.25; font-weight: 500; }
+
+.body-md { font-size: 15px; line-height: 1.55; font-weight: 400; }
+.body-strong { font-size: 15px; line-height: 1.5; font-weight: 500; }
+
+.caption-md { font-size: 13px; line-height: 1.4; font-weight: 400; }
+.caption-sm { font-size: 12px; line-height: 1.4; font-weight: 500; }
+.utility-xs { font-size: 11px; line-height: 1.4; font-weight: 400; letter-spacing: 0.03em; }
+
+/* RTL helpers for the customer-facing site */
+.rtl {
+  direction: rtl;
+}
