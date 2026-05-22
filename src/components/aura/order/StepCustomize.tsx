@@ -1,5 +1,6 @@
 import { useState, useEffect, type CSSProperties } from "react";
 import type { Product, PackUnit } from "@/lib/store-service";
+import { imgUrl, imgUrls } from "@/lib/store-service";
 
 interface UnitState {
   size?: string;
@@ -50,14 +51,16 @@ function ColorTooltip({ tooltip }: { tooltip: TooltipState }) {
   };
 
   if (image_urls.length > 0) {
+    const thumb = imgUrls(image_urls, { width: 300, resize: "contain" });
     return (
       <div className={baseClasses} style={style}>
         <div className={`${sizeClasses} ${roundedClasses} bg-aura-surface-2 relative`}>
-          {image_urls.map((url, i) => (
+          {thumb.map((url, i) => (
             <img
               key={url}
               src={url}
               alt={`${name} ${i + 1}`}
+              loading="lazy"
               className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out"
               style={{ opacity: i === current ? 1 : 0 }}
             />
@@ -161,7 +164,7 @@ export function StepCustomize({ units, productsMap, values, onChange }: Props) {
                       }`}
                       style={{ backgroundColor: c.hex }}
                     >
-                      {c.image_url && <img src={c.image_url} alt={c.name} className="absolute inset-0 w-full h-full object-cover" />}
+                      {c.image_url && <img src={imgUrl(c.image_url, { width: 80, height: 80, resize: "cover" })} alt={c.name} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />}
                       {selected && (
                         <div className="absolute inset-0 m-auto h-6 w-6 rounded-full border-2 border-white bg-aura-violet/70" />
                       )}

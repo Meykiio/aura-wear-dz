@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { storeService } from "@/lib/store-service";
+import { storeService, packsQuery } from "@/lib/store-service";
 import { Navbar } from "@/components/aura/Navbar";
 import { Hero } from "@/components/aura/Hero";
 import { PackCard } from "@/components/aura/PackCard";
@@ -20,10 +20,7 @@ export function Landing() {
   const [isScrolled, setIsScrolled] = useState(false);
   const packsRef = useRef<HTMLElement>(null);
 
-  const { data: packs = [] } = useQuery({
-    queryKey: ["packs"],
-    queryFn: storeService.getPacks,
-  });
+  const { data: packs = [] } = useQuery(packsQuery);
 
   useEffect(() => {
     const onScroll = () => {

@@ -3,7 +3,7 @@ import { X, ChevronRight } from "lucide-react";
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { storeService, productsToMap, unitsForPack, type Pack } from "@/lib/store-service";
+import { productsToMap, unitsForPack, catalogQuery, type Pack } from "@/lib/store-service";
 import { StepCustomize } from "./order/StepCustomize";
 import { StepSummary } from "./order/StepSummary";
 import { StepShipping } from "./order/StepShipping";
@@ -26,10 +26,7 @@ type OrderAction =
   | { type: "success" };
 
 export function OrderModal({ pack, onClose }: { pack: Pack; onClose: () => void }) {
-  const { data: products = [] } = useQuery({
-    queryKey: ["products"],
-    queryFn: storeService.getProducts,
-  });
+  const { data: products = [] } = useQuery(catalogQuery);
   const productsMap = useMemo(() => productsToMap(products), [products]);
   const units = useMemo(() => unitsForPack(pack, productsMap), [pack, productsMap]);
 

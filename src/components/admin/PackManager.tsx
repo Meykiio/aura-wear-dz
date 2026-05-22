@@ -11,10 +11,12 @@ export function PackManager() {
   const { data: packs = [], isLoading } = useQuery({
     queryKey: ["admin-packs"],
     queryFn: storeService.getPacks,
+    staleTime: 1000 * 60 * 2,
   });
   const { data: products = [] } = useQuery({
     queryKey: ["admin-products"],
     queryFn: storeService.getProducts,
+    staleTime: 1000 * 60 * 2,
   });
 
   const [editing, setEditing] = useState<Pack | null>(null);

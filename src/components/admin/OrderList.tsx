@@ -66,6 +66,7 @@ export function OrderList() {
       if (error) throw error;
       return (data || []) as OrderRow[];
     },
+    staleTime: 1000 * 60 * 2,
   });
 
   const filtered = useMemo(() => {

@@ -16,6 +16,8 @@ export interface PackItem {
 
 export const MEDIA_BUCKET = "product-media";
 
+const STALE = 1000 * 60 * 5; // 5 min stale time for catalog data
+
 export const storeService = {
   async getProducts() {
     const { data, error } = await supabase
@@ -57,6 +59,65 @@ export const storeService = {
     return data.publicUrl;
   },
 };
+
+/* ── Query defaults ─────────────────────────── */
+
+export const catalogQuery = {
+  queryKey: ["products"],
+  queryFn: storeService.getProducts,
+  staleTime: STALE,
+};
+
+export const packsQuery = {
+  queryKey: ["packs"],
+  queryFn: storeService.getPacks,
+  staleTime: STALE,
+};
+
+export const approvedReviewsQuery = {
+  queryKey: ["approved-reviews"],
+  queryFn: storeService.getApprovedReviews,
+  staleTime: STALE,
+};
+
+/* ── Image optimisation ─────────────────────── */
+
+/**
+ * Returns a Supabase render URL that serves a resized/WebP version of the
+ * original image. Falls back to the original URL if transformation fails.
+ *
+ * Usage:  imgUrl(originalUrl, { width: 100, height: 100 })
+ */
+export function imgUrl(
+  url: string | null | undefined,
+  opts?: { width?: number; height?: number; resize?: "cover" | "contain" | "fill" },
+): string | undefined {
+  if (!url) return undefined;
+  if (!opts) return url;
+
+  const { width, height, resize } = opts;
+
+  // Only transform Supabase Storage URLs
+  if (!url.includes("/storage/v1/object/public/")) return url;
+
+  const renderUrl = url.replace("/object/public/", "/render/image/public/");
+  const params = new URLSearchParams();
+  if (width) params.set("width", String(width));
+  if (height) params.set("height", String(height));
+  if (resize) params.set("resize", resize);
+  params.set("format", "webp");
+  return `${renderUrl}?${params.toString()}`;
+}
+
+/**
+ * Same as imgUrl but returns an array of transformed URLs.
+ */
+export function imgUrls(
+  urls: string[],
+  opts?: { width?: number; height?: number; resize?: "cover" | "contain" | "fill" },
+): string[] {
+  return urls.map((u) => imgUrl(u, opts) ?? u);
+}
 
 export function productsToMap(products: Product[]): Record<string, Product> {
   return Object.fromEntries(products.map((p) => [p.id, p]));

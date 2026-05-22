@@ -15,6 +15,7 @@ export function ReviewManager() {
       if (error) throw error;
       return data;
     },
+    staleTime: 1000 * 60 * 2,
   });
 
   const approve = useMutation({

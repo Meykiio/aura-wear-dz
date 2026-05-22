@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2, Edit2, X, Save, Palette } from "lucide-react";
 import toast from "react-hot-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { storeService, type Product, type ProductColor } from "@/lib/store-service";
+import { storeService, imgUrl, type Product, type ProductColor } from "@/lib/store-service";
 import { MediaUploader } from "./MediaUploader";
 
 const CATEGORIES = ["tshirt", "polo", "short", "jogging", "accessory", "other"];
@@ -14,6 +14,7 @@ export function ProductManager() {
   const { data: products = [], isLoading } = useQuery({
     queryKey: ["admin-products"],
     queryFn: storeService.getProducts,
+    staleTime: 1000 * 60 * 2,
   });
 
   const [editing, setEditing] = useState<Product | null>(null);
@@ -112,7 +113,7 @@ function ProductCard({ product, onEdit, onDelete }: { product: Product; onEdit: 
               style={{ backgroundColor: c.hex }}
               title={c.name}
             >
-              {c.image_url && <img src={c.image_url} alt={c.name} className="absolute inset-0 w-full h-full object-cover" />}
+                    {c.image_url && <img src={imgUrl(c.image_url, { width: 48, height: 48, resize: "cover" })} alt={c.name} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />}
             </div>
           ))}
           {product.colors.length > 12 && (

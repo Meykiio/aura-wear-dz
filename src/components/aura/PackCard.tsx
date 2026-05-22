@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { storeService, productsToMap, type Pack, type PackItem } from "@/lib/store-service";
+import { productsToMap, imgUrl, catalogQuery, type Pack, type PackItem } from "@/lib/store-service";
 
 interface PackCardProps {
   pack: Pack;
@@ -7,10 +7,7 @@ interface PackCardProps {
 }
 
 export function PackCard({ pack, onOrder }: PackCardProps) {
-  const { data: products = [] } = useQuery({
-    queryKey: ["products"],
-    queryFn: storeService.getProducts,
-  });
+  const { data: products = [] } = useQuery(catalogQuery);
   const productsMap = productsToMap(products);
   const items = ((pack.items as unknown) as PackItem[]) || [];
   const labelPiece = pack.name.split(" ")[1] || pack.name;
@@ -33,7 +30,7 @@ export function PackCard({ pack, onOrder }: PackCardProps) {
           pack.media_type === "video" ? (
             <video src={pack.media_url} autoPlay loop muted playsInline className="w-full h-full object-cover" />
           ) : (
-            <img src={pack.media_url} alt={pack.name} className="w-full h-full object-cover" />
+            <img src={imgUrl(pack.media_url, { width: 600, resize: "contain" })} alt={pack.name} loading="lazy" className="w-full h-full object-cover" />
           )
         ) : (
           <>

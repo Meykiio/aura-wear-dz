@@ -1,12 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { storeService } from "@/lib/store-service";
-import { StaggerTestimonials } from "@/components/ui/stagger-testimonials";
+import { approvedReviewsQuery } from "@/lib/store-service";
 
 export function Reviews() {
-  const { data: dbReviews = [], isLoading } = useQuery({
-    queryKey: ["approved-reviews"],
-    queryFn: storeService.getApprovedReviews,
-  });
+  const { data: dbReviews = [], isLoading } = useQuery(approvedReviewsQuery);
 
   const reviews = dbReviews.map(r => ({
     testimonial: r.comment,
