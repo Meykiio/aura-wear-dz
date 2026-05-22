@@ -22,6 +22,7 @@ PostgreSQL on Supabase. RLS is enabled on every table. Schema is defined entirel
 | 14 | `20260522213000_grant_admin_orders_crud.sql` | Grants `INSERT, UPDATE, DELETE` on `orders` to `authenticated`. Was missing from the initial admin CRUD migration — caused 401 on status update. |
 | 15 | `20260522214000_add_image_urls_array.sql` | Adds `image_urls text[] DEFAULT '{}'` to `product_colors` for storing multiple variant images per color (e.g. male + female). |
 | 16 | `20260522214500_seed_tshirt_regular_colors.sql` | Seeds 21 colors with images for the T-shirt Regular product from the catalogue. |
+| 17 | `20260522220000_seed_catalogue.sql` | Seeds Polo Demi-Manches (25 colors, male+female), T-shirt Oversized (3 colors, male+female), Sacoche (1 color, 2 variants), and Short Regular (8 colors, male). |
 
 ## Tables
 
