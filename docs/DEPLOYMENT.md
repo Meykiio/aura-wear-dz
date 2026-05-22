@@ -21,7 +21,7 @@ Add **all** of these in **Project → Settings → Environment Variables**, for 
 | Name | Value |
 |---|---|
 | `VITE_SUPABASE_URL` | your Supabase project URL |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | your Supabase anon key |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | your Supabase publishable key (`sb_publishable_...`) |
 | `VITE_SUPABASE_PROJECT_ID` | your Supabase project ref |
 | `SUPABASE_URL` | same as `VITE_SUPABASE_URL` |
 | `SUPABASE_PUBLISHABLE_KEY` | same as `VITE_SUPABASE_PUBLISHABLE_KEY` |
@@ -58,6 +58,7 @@ Vercel → **Project → Settings → Domains** → add your domain, follow the 
 - **Auth redirects to localhost** — Site URL still points to localhost. Fix step 5.
 - **`Missing Supabase environment variable(s)` in Vercel logs** — Vercel didn't pick up the server vars. Check they exist for the Production env (not just Preview) and trigger a redeploy.
 - **RLS policy errors** — the user isn't in `user_roles`, or you're calling a mutation as anon when it requires admin.
+- **401 Unauthorized on public tables** — PostgREST needs base GRANTs on the table in addition to RLS policies. Run the latest migrations (`supabase db push`) to ensure the GRANT migrations are applied.
 
 ## Alternative hosts
-The build output is plain Vite + a Node SSR entry, so any Node-capable host (Render, Fly, Railway, a VPS) works the same way. Drop the `vite build` output, run the SSR entry on Node ≥ 20, set the same env vars.
+The build output is plain Vite + a Node SSR entry (Nitro), so any Node-capable host (Render, Fly, Railway, a VPS) works the same way. Run `npm run build`, then execute the SSR entry on Node ≥ 20 with the same env vars.

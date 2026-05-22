@@ -14,6 +14,11 @@ PostgreSQL on Supabase. RLS is enabled on every table. Schema is defined entirel
 | 6 | `20260513150000_add_image_url_to_reviews.sql` | Adds `reviews.image_url`. |
 | 7 | `20260514020529_*.sql` | Re-grants `has_role` EXECUTE to anon + authenticated (RLS policies need it). |
 | 8 | `20260519000000_export_baseline_security.sql` | **Export baseline.** Adds `validate_order()` + `validate_review()` triggers, tightens `orders` INSERT policy, replaces `reviews` SELECT/INSERT policies with explicit ones, removes the broad public listing policy on `storage.objects`. Idempotent. |
+| 9 | `20260522193000_grant_anon_public_access.sql` | Grants `USAGE ON SCHEMA public` + `SELECT ON ALL TABLES` to `anon` and `authenticated` roles. Required for PostgREST to reach RLS policies. |
+| 10 | `20260522210000_grant_admin_crud_tables.sql` | Grants `INSERT, UPDATE, DELETE` on `products`, `product_colors`, `packs`, `reviews` to `authenticated` role. Grants `ALL ON storage.objects` to `authenticated`. Adds `ALTER DEFAULT PRIVILEGES` for future tables. |
+| 11 | `20260522211000_seed_reviews.sql` | Seeds 8 approved reviews (Arabic testimonials) with `ON CONFLICT` upsert. |
+| 12 | `20260522211500_grant_service_role_select.sql` | Grants `SELECT ON ALL TABLES` to `service_role` so the server-side admin client can bypass RLS. |
+| 13 | `20260522212000_fix_reviews_approved.sql` | Fixes reviews seed (trigger forced `is_approved=false`). Drops trigger, updates/inserts rows with `is_approved=true`, re-creates trigger. |
 
 ## Tables
 
@@ -111,6 +116,23 @@ Catalog items.
 - API-level listing of objects is closed (no public SELECT policy on `storage.objects`).
 - Only admins can upload, update, or delete objects.
 
+## Security model
+
+### PostgREST requires base GRANTs
+RLS policies alone are **not enough**. PostgREST requires the requesting role to have a base `GRANT` on the table (SELECT/INSERT/etc.), even if RLS is enabled. If the base GRANT is missing, PostgREST returns `401 Unauthorized` before RLS is ever evaluated.
+
+**Required base GRANTs (by migration):**
+
+| Table(s) | Role | Operations | Migration |
+|---|---|---|---|
+| All public tables | `anon` | SELECT | `20260522193000` |
+| All public tables | `authenticated` | SELECT | `20260522193000` |
+| `products`, `product_colors`, `packs`, `reviews` | `authenticated` | INSERT, UPDATE, DELETE | `20260522210000` |
+| `storage.objects` | `authenticated` | ALL | `20260522210000` |
+| All public tables | `service_role` | SELECT | `20260522211500` |
+
+Default privileges (`ALTER DEFAULT PRIVILEGES`) are also set so future tables automatically get the same grants.
+
 ## Functions
 
 ### `public.has_role(_user_id uuid, _role app_role) → bool`
@@ -132,3 +154,4 @@ supabase gen types typescript --project-id <your-project-ref> > src/integrations
 ## Notes
 - Deleting a product or pack does NOT cascade-delete its uploaded media files from Storage. Clean those up manually when needed.
 - The `customizations` JSON shape is a contract between the order flow components and the admin dashboard; if you change it, update both sides.
+- When seeding data via migration (bypassing the application layer), the `validate_review` trigger sets `is_approved=false` because `auth.uid()` is null. Either set `is_approved=true` in a follow-up migration after dropping/re-creating the trigger, or update rows directly while the trigger is disabled.

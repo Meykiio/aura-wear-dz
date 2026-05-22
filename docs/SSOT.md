@@ -7,6 +7,7 @@ Arabic-language e-commerce landing page for AuraWear, a clothing brand. Visitors
 
 ## Stack at a glance
 - TanStack Start v1 (React 19) + Vite 7 — SSR + file-based routing
+- Nitro (`vercel` preset) — SSR deployment on Vercel
 - Tailwind CSS v4 + shadcn UI + Radix primitives
 - Supabase (Postgres + Auth + Storage) — no edge functions, no cron
 - Hosted on Vercel
@@ -23,7 +24,7 @@ Arabic-language e-commerce landing page for AuraWear, a clothing brand. Visitors
 | Read API for products/packs/reviews + media upload | `src/lib/store-service.ts` |
 | Auth context + isAdmin check | `src/lib/auth-context.tsx` |
 | Static UI copy / catalog text | `src/lib/aura-data.ts` |
-| DB schema, RLS, triggers, storage | `supabase/migrations/*` (see `docs/DATABASE.md`) |
+| DB schema, RLS, triggers, storage, base GRANTs | `supabase/migrations/*` (see `docs/DATABASE.md`) |
 | Browser Supabase client | `src/integrations/supabase/client.ts` |
 | Server (admin / RLS-bypass) Supabase client | `src/integrations/supabase/client.server.ts` |
 | Server-fn auth middleware | `src/integrations/supabase/auth-middleware.ts` |
@@ -31,11 +32,14 @@ Arabic-language e-commerce landing page for AuraWear, a clothing brand. Visitors
 | Generated DB types | `src/integrations/supabase/types.ts` (regenerate via `supabase gen types`) |
 | Theme tokens / Tailwind | `src/styles.css` |
 | Env vars | `.env.example` + `docs/ENVIRONMENT.md` |
+| Deployment config (Nitro vercel preset) | `vite.config.ts` |
+| Hydration mismatch suppression | `src/routes/__root.tsx` + `src/components/aura/Hero.tsx` |
 
 ## Data ownership rules
-- **Customer never authenticates.** Order + review submissions go straight to Postgres via the anon key. RLS policies + BEFORE INSERT triggers (`validate_order`, `validate_review`) are the only thing standing between the public and the database — never weaken them.
+- **Customer never authenticates.** Order + review submissions go straight to Postgres via the publishable key. RLS policies + BEFORE INSERT triggers (`validate_order`, `validate_review`) are the only thing standing between the public and the database — never weaken them.
 - **Admin = `user_roles` row with `role='admin'`.** Roles are never stored on the user object directly. Check via the `has_role(uuid, app_role)` SECURITY DEFINER function from RLS policies.
 - **Service role key never reaches the browser.** It lives only in `process.env.SUPABASE_SERVICE_ROLE_KEY` and is consumed only by `client.server.ts`. Never import that file from anything outside server functions.
+- **Base GRANTs required for PostgREST.** RLS policies are evaluated *after* PostgREST checks whether the role has table-level permissions. Without `GRANT SELECT ON ... TO anon`, even permissive RLS policies return 401. Every deployment must have the GRANT migrations applied.
 
 ## Conventions
 - Use semantic Tailwind tokens (`bg-background`, `text-foreground`, etc.) from `src/styles.css`. Don't hardcode hex in components.
@@ -50,7 +54,7 @@ Arabic-language e-commerce landing page for AuraWear, a clothing brand. Visitors
 
 ## See also
 - `docs/ARCHITECTURE.md` — how the system works
-- `docs/DATABASE.md` — schema + RLS reference
+- `docs/DATABASE.md` — schema + RLS + migrations + base GRANT reference
 - `docs/SETUP.md` — local setup steps
 - `docs/DEPLOYMENT.md` — Vercel deployment steps
 - `docs/ENVIRONMENT.md` — env-var reference

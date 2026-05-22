@@ -2,11 +2,11 @@
 
 ## Stack
 - **Framework:** TanStack Start v1 (React 19) — file-based routing, SSR, isomorphic loaders, server functions.
-- **Build:** Vite 7. Tailwind CSS v4 via `@tailwindcss/vite`.
+- **Build:** Vite 7 + Nitro (`vercel` preset) for SSR deployment. Tailwind CSS v4 via `@tailwindcss/vite`.
 - **UI:** Radix primitives + shadcn-style components in `src/components/ui/`. Tailwind tokens in `src/styles.css`.
 - **Data:** TanStack Query for client cache. Supabase JS SDK for DB/Auth/Storage.
 - **Backend:** Supabase (PostgreSQL + Row Level Security + Auth + Storage). No edge functions, no cron.
-- **Hosting:** Vercel (Node SSR build emitted by Vite).
+- **Hosting:** Vercel (Node SSR build emitted by Nitro).
 
 ## Code map
 ```
@@ -28,7 +28,7 @@ src/
     aura-data.ts           Static UI copy
     error-page.ts          Branded SSR error fallback HTML
   integrations/supabase/
-    client.ts              Browser Supabase client (anon key, session persisted)
+    client.ts              Browser Supabase client (anon/publishable key, session persisted)
     client.server.ts       Server-only admin client (service role key, bypasses RLS)
     auth-middleware.ts     `requireSupabaseAuth` server-fn middleware
     auth-attacher.ts       Client middleware that attaches the bearer token to server-fn RPCs
@@ -39,14 +39,13 @@ src/
 ## Data flow
 
 ### Public reads
-Landing page (`/`) calls `storeService.getProducts()`, `getPacks()`, `getApprovedReviews()` directly from the browser using the anon key. RLS allows anonymous SELECT on `products`, `product_colors`, `packs`, and approved `reviews`.
+Landing page (`/`) calls `storeService.getProducts()`, `getPacks()`, `getApprovedReviews()` directly from the browser using the publishable key. RLS allows anonymous SELECT on `products`, `product_colors`, `packs`, and approved `reviews`. Note: PostgREST requires base **GRANTs** on tables in addition to RLS policies — see `docs/DATABASE.md#security-model`.
 
 ### Order submission
 `OrderModal` posts to `public.orders` from the browser. The `Anyone can insert valid order` RLS policy + `validate_order()` BEFORE INSERT trigger enforce field lengths, phone format, prices, and force `status='pending'`. The customer never authenticates.
 
 ### Review submission
 `/review` posts to `public.reviews`. RLS allows anon INSERT only when `is_approved=false`; the `validate_review()` trigger blocks self-approval and validates content.
-
 ### Admin
 Email/password login (Supabase Auth). The `useAuth` context reads `user_roles` to compute `isAdmin`. Admin routes (`/admin`, `/dashboard`) gate on `isAdmin`. All product / pack / review / order mutations happen from the authenticated browser client; RLS `Admins can manage X` policies authorize them via `has_role(auth.uid(), 'admin')`.
 
@@ -70,3 +69,10 @@ The project does not currently use any server functions — all data access goes
 
 ## Server / SSR
 TanStack Start renders pages on the server, then hydrates on the client. Loaders run in both environments. There are no protected server functions, so no token-attachment is required at the moment — but `auth-attacher.ts` is wired in `start.ts` so any future `requireSupabaseAuth`-protected server fn will work out of the box.
+
+## Hydration mismatches
+Browser extensions can inject attributes into the DOM (e.g. `cz-shortcut-listen="true"` on `<body>`, `data-video="0"` on `<video>`) that cause React hydration mismatch warnings. These are handled via `suppressHydrationWarning` on the affected elements:
+- `src/routes/__root.tsx`: `<body suppressHydrationWarning>`
+- `src/components/aura/Hero.tsx`: `<video suppressHydrationWarning>`
+
+This is safe — the mismatched attributes are added client-side by extensions and have no effect on functionality.

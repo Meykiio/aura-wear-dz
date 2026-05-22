@@ -9,11 +9,15 @@ Two environments, six variables. Every variable lives in `.env` for local dev an
 | Name | Scope | Where to find | Purpose |
 |---|---|---|---|
 | `VITE_SUPABASE_URL` | client | Supabase → Project Settings → API → Project URL | Browser Supabase client base URL |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | client | Supabase → Project Settings → API → `anon` key | Browser auth + anon DB calls (RLS enforced) |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | client | Supabase → Project Settings → API → anon/publishable key (`sb_publishable_...` or legacy JWT) | Browser auth + anon DB calls (RLS enforced) |
 | `VITE_SUPABASE_PROJECT_ID` | client | The subdomain in your Project URL | Used by tooling and a few UI helpers |
 | `SUPABASE_URL` | server | Same value as `VITE_SUPABASE_URL` | SSR / server functions |
 | `SUPABASE_PUBLISHABLE_KEY` | server | Same value as `VITE_SUPABASE_PUBLISHABLE_KEY` | SSR / `requireSupabaseAuth` middleware |
 | `SUPABASE_SERVICE_ROLE_KEY` | server | Supabase → Project Settings → API → `service_role` key | **Secret.** Admin client (`supabaseAdmin`); bypasses RLS. Server-only. |
+
+### Key format notes
+
+Supabase now uses a new key format that starts with `sb_publishable_` for the publishable (anon) key and `sb_secret_` for the secret (service_role) key. Older projects may still use legacy JWT keys starting with `eyJhbGci...`. Both formats work; use whichever your project dashboard shows.
 
 ### Optional
 
