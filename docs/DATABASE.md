@@ -23,6 +23,7 @@ PostgreSQL on Supabase. RLS is enabled on every table. Schema is defined entirel
 | 15 | `20260522214000_add_image_urls_array.sql` | Adds `image_urls text[] DEFAULT '{}'` to `product_colors` for storing multiple variant images per color (e.g. male + female). |
 | 16 | `20260522214500_seed_tshirt_regular_colors.sql` | Seeds 21 colors with images for the T-shirt Regular product from the catalogue. |
 | 17 | `20260522220000_seed_catalogue.sql` | Seeds Polo Demi-Manches (25 colors, male+female), T-shirt Oversized (3 colors, male+female), Sacoche (1 color, 2 variants), and Short Regular (8 colors, male). |
+| 18 | `20260522221000_fix_oversized_black.sql` | Adds Black (#000000) color to T-shirt Oversized — the `white-000000` images were actually the black product. Oversized now has 4 colors: beige, green, white, black. |
 
 ## Tables
 
