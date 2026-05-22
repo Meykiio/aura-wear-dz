@@ -19,6 +19,7 @@ PostgreSQL on Supabase. RLS is enabled on every table. Schema is defined entirel
 | 11 | `20260522211000_seed_reviews.sql` | Seeds 8 approved reviews (Arabic testimonials) with `ON CONFLICT` upsert. |
 | 12 | `20260522211500_grant_service_role_select.sql` | Grants `SELECT ON ALL TABLES` to `service_role` so the server-side admin client can bypass RLS. |
 | 13 | `20260522212000_fix_reviews_approved.sql` | Fixes reviews seed (trigger forced `is_approved=false`). Drops trigger, updates/inserts rows with `is_approved=true`, re-creates trigger. |
+| 14 | `20260522213000_grant_admin_orders_crud.sql` | Grants `INSERT, UPDATE, DELETE` on `orders` to `authenticated`. Was missing from the initial admin CRUD migration — caused 401 on status update. |
 
 ## Tables
 
@@ -128,6 +129,7 @@ RLS policies alone are **not enough**. PostgREST requires the requesting role to
 | All public tables | `anon` | SELECT | `20260522193000` |
 | All public tables | `authenticated` | SELECT | `20260522193000` |
 | `products`, `product_colors`, `packs`, `reviews` | `authenticated` | INSERT, UPDATE, DELETE | `20260522210000` |
+| `orders` | `authenticated` | INSERT, UPDATE, DELETE | `20260522213000` |
 | `storage.objects` | `authenticated` | ALL | `20260522210000` |
 | All public tables | `service_role` | SELECT | `20260522211500` |
 
